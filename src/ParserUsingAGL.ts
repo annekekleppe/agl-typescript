@@ -1,10 +1,9 @@
 // adapted from "net.akehurst.language/examples/js/node/src/main.js"
 import agl_module from "net.akehurst.language-agl-processor";
 import { SimpleExampleSyntaxAnalyser } from "./SimpleExampleSyntaxAnalyser";
+const Agl = agl_module.net.akehurst.language.agl.processor.Agl; // define a short name
 
 export class ParserUsingAGL {
-    // without the following magic line, it does not work
-    Agl = agl_module.net.akehurst.language.agl.processor.Agl;
     grammarStr = `
 namespace test
 grammar SimpleExample {
@@ -47,9 +46,9 @@ class Anneke {
 }
 `;
         let sppt = this.proc.parse(sentence);
-        console.info(sppt);
+        console.info(sppt.toStringAllWithIndent('  '));
 
-        let asm = this.proc.process(sentence);
+        let asm = this.proc.process(null, sentence);
         console.info(typeof asm);
         console.info(asm);
 
