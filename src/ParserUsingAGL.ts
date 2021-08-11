@@ -1,7 +1,9 @@
 // adapted from "net.akehurst.language/examples/js/node/src/main.js"
-import agl_module from "net.akehurst.language-agl-processor";
+import {net} from "net.akehurst.language-agl-processor";
 import { SimpleExampleSyntaxAnalyser } from "./SimpleExampleSyntaxAnalyser";
-const Agl = agl_module.net.akehurst.language.agl.processor.Agl; // define a short name
+import LanguageProcessor = net.akehurst.language.api.processor.LanguageProcessor;
+import Agl = net.akehurst.language.agl.processor.Agl;
+// const Agl = agl_module.net.akehurst.language.agl.processor.Agl; // define a short name
 
 export class ParserUsingAGL {
     grammarStr = `
@@ -31,11 +33,14 @@ grammar SimpleExample {
 `;
     // analyser = new SimpleExampleSyntaxAnalyser();
     // proc = this.Agl.processorFromString(this.grammarStr, this.analyser);
-    proc = this.Agl.processorFromString(this.grammarStr);
+    proc: LanguageProcessor  = Agl.processorFromString(this.grammarStr, null, null, null
+        // SimpleExampleSyntaxAnalyser(),
+        // SimpleExampleFormatter()
+    );
 
     doIt() {
         let sentence = `
-class class {
+class David {
   property : String
   prop2 : Integer
   method(p1: Integer, p2: String) {
@@ -48,12 +53,12 @@ class Anneke {
         let sppt = this.proc.parse(sentence);
         console.info(sppt.toStringAllWithIndent('  '));
 
-        let asm = this.proc.process(null, sentence);
-        console.info(typeof asm);
-        console.info(asm);
-
-        let formatted = this.proc.formatAsm(asm)
-        console.info("formatted: " + formatted);
+        // let asm = this.proc.process(null, sentence);
+        // console.info(typeof asm);
+        // console.info(asm);
+        //
+        // let formatted = this.proc.formatAsm(asm)
+        // console.info("formatted: " + formatted);
     }
 }
 
