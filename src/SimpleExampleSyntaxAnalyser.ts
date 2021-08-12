@@ -27,12 +27,15 @@ import {
     SimpleExampleUnit
 } from "./ASM_TypeDefinitions";
 import SyntaxAnalyser = net.akehurst.language.api.syntaxAnalyser.SyntaxAnalyser;
+import SyntaxAnalyserException = net.akehurst.language.api.syntaxAnalyser.SyntaxAnalyserException;
 import SharedPackedParseTree = net.akehurst.language.api.sppt.SharedPackedParseTree;
 import SPPTBranch = net.akehurst.language.api.sppt.SPPTBranch;
+import SPPTLeaf = net.akehurst.language.api.sppt.SPPTLeaf;
+import SyntaxAnalyserAbstract = net.akehurst.language.agl.syntaxAnalyser.SyntaxAnalyserAbstract;
 
-export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
+export class SimpleExampleSyntaxAnalyser extends SyntaxAnalyserAbstract implements SyntaxAnalyser {
     constructor() {
-        // super();
+        super();
         // super.register("unit", this.unit as BranchHandler<SimpleExampleUnit>);
         // super.register("definition", this.definition as BranchHandler<Definition>)
         // super.register("classDefinition", this.classDefinition as BranchHandler<ClassDefinition>)
@@ -46,9 +49,76 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         throw new Error("Method not implemented.");
     }
     transform<T>(sppt: SharedPackedParseTree): T {
-        throw new Error("Method not implemented.");
+        console.log(`sppt: ${sppt}, maxNumHeads: ${sppt.maxNumHeads}, countTrees: ${sppt.countTrees}, root: ${sppt.root}`);
+        this.visit(sppt);
+        if (!!sppt.root) {
+            return this.transformBranch(sppt.root.asBranch);
+        } else {
+            return null;
+        }
     }
 
+    transformBranch<T>(branch: SPPTBranch, arg?: any): T {
+        let result = this.transformOpt(branch, arg);
+        if (!result) throw new SyntaxAnalyserException("cannot transform ${branch}", null);
+        return result as T;
+    }
+
+    transformOpt<T>(branch?: SPPTBranch, arg?: any): T {
+        if (null == branch){
+            return null;
+        } else {
+            // let asm = this.visit(branch, arg) as T;
+            // this.locationMap[asm as any] = branch.location;
+            // return asm;
+            return null;
+        }
+    }
+
+    // --- IParseTreeVisitor ---
+    visit(target: SharedPackedParseTree, arg?: any): any {
+        let root = target.root;
+        let type = typeof root;
+        // console.log(`root: ${root}, typeof root: ${type}`);
+        // switch(typeof root) {
+        //     case SPPTLeaf: {
+        //         //statements;
+        //         break;
+        //     }
+        //     case constant_expression2: {
+        //         //statements;
+        //         break;
+        //     }
+        //     default: {
+        //         //statements;
+        //         break;
+        //     }
+        // }
+        // fun visit(target: SPPTNode, arg: A) = when (target) {
+        //     is SPPTLeaf -> visit(target, arg)
+        //     is SPPTBranch -> visit(target, arg)
+        // else -> error("Unknown subtype of SPPTNode ${target::class.simpleName}")
+        //
+        // }
+        // return this.visit(root, arg);
+    }
+
+    // visitLeaf(target: SPPTLeaf, arg?: any): any {
+    //     return target.matchedText
+    // }
+    //
+    // visitBranch(target: SPPTBranch, arg?: any): any {
+    //     let branchName = target.name
+    //     let handler = this.findBranchHandler<any>(branchName)
+    //     let branchChildren = target.branchNonSkipChildren// .stream().map(it -> it.getIsEmpty() ? null :
+    //     // it).collect(Collectors.toList());
+    //     try {
+    //         return handler.invoke(target, branchChildren, arg)
+    //     } catch (e) {
+    //         throw new SyntaxAnalyserException("Exception trying to transform ${target}", e);
+    //     }
+    // }
+    
     // override clear() {
     //     // do nothing
     // }

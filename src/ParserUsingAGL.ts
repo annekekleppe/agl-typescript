@@ -3,6 +3,7 @@ import {net} from "net.akehurst.language-agl-processor";
 import { SimpleExampleSyntaxAnalyser } from "./SimpleExampleSyntaxAnalyser";
 import LanguageProcessor = net.akehurst.language.api.processor.LanguageProcessor;
 import Agl = net.akehurst.language.agl.processor.Agl;
+import AutomatonKind_api = net.akehurst.language.api.processor.AutomatonKind_api;
 // const Agl = agl_module.net.akehurst.language.agl.processor.Agl; // define a short name
 
 export class ParserUsingAGL {
@@ -31,12 +32,8 @@ grammar SimpleExample {
     STRING = "'(?:\\\\?.)*?'" ;
 }
 `;
-    // analyser = new SimpleExampleSyntaxAnalyser();
-    // proc = this.Agl.processorFromString(this.grammarStr, this.analyser);
-    proc: LanguageProcessor  = Agl.processorFromString(this.grammarStr, null, null, null
-        // SimpleExampleSyntaxAnalyser(),
-        // SimpleExampleFormatter()
-    );
+    analyser = new SimpleExampleSyntaxAnalyser();
+    proc: LanguageProcessor  = Agl.processorFromString(this.grammarStr, this.analyser, null, null);
 
     doIt() {
         let sentence = `
@@ -53,7 +50,7 @@ class Anneke {
         let sppt = this.proc.parse(sentence);
         console.info(sppt.toStringAllWithIndent('  '));
 
-        // let asm = this.proc.process(null, sentence);
+        let asm = this.proc.process(null, sentence, AutomatonKind_api.LOOKAHEAD_1);
         // console.info(typeof asm);
         // console.info(asm);
         //
