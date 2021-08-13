@@ -48,11 +48,11 @@ class Anneke {
 }
 `;
         let sppt = this.proc.parse(sentence);
-        console.info(sppt.toStringAllWithIndent('  '));
+        //console.info(sppt.toStringAllWithIndent('  '));
 
         let asm = this.proc.process(null, sentence, AutomatonKind_api.LOOKAHEAD_1);
-        // console.info(typeof asm);
-        // console.info(asm);
+        console.info(typeof asm);
+        console.info(asm);
         //
         // let formatted = this.proc.formatAsm(asm)
         // console.info("formatted: " + formatted);
