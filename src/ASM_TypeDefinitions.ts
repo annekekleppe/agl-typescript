@@ -15,14 +15,17 @@
  */
 
 export interface SimpleExampleType {
-    treeToString();
+    treeToString(): string;
 }
 
 export class SimpleExampleUnit implements SimpleExampleType {
     definitions: Definition[] = [];
 
     treeToString() : string {
-        return this.definitions.map(def => def.treeToString()).join("\n\n");
+        return this.definitions.map(def => {
+            console.log("Def [" + def + "]");
+            return def.treeToString()
+        }).join("\n\n");
     }
 }
 

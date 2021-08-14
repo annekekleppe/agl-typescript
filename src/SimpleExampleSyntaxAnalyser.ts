@@ -52,7 +52,7 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         }
     }
 
-    private transformNode(node: SPPTNode): SimpleExampleType {
+    private transformNode(node: SPPTNode): SimpleExampleType  {
         if (node.isLeaf) {
             return this.transformLeaf(node as SPPTLeaf);
         } else if (node.isBranch) {
@@ -83,14 +83,15 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
             case "parameterDefinition" : {
                 return this.parameterDefinition(branch, branch.children);
             }
+            default : {
+                // var res: SimpleExampleType[] = [];
+                // for (const child of branch.children.toArray()) {
+                //     res.push(this.transformNode(child));
+                // }
+                // return res;
+            }
         }
         return null;
-        // var res = `branch ${branch.name} \n`;
-        // for (const child of branch.children.toArray()) {
-        //     res += this.transformNode(child);
-        //     res+='\n';
-        // }
-        // return res;
     }
 
     private transformLeaf(leaf: SPPTLeaf, arg?: any): SimpleExampleType {
@@ -99,11 +100,11 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
 
     // unit = definition* ;
     unit(target: SPPTBranch, children: SPPTBranch[]): SimpleExampleUnit {
-        let result: SimpleExampleUnit;
-        let definitions = children[0].branchNonSkipChildren.map(it =>
+        let result: SimpleExampleUnit = new SimpleExampleUnit();
+        let definitions = children[0].branchNonSkipChildren.toArray().map(it =>
             child => this.transform<Definition>(it)
         );
-        result.definitions.push(definitions);
+        result.definitions.push(...definitions);
         return result;
     }
 
