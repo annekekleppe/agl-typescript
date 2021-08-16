@@ -44,13 +44,18 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
 
     transform<SimpleExampleType>(sppt: SharedPackedParseTree): SimpleExampleType {
         console.log(`sppt: ${sppt.root?.name}, maxNumHeads: ${sppt.maxNumHeads}, countTrees: ${sppt.countTrees}, root: ${sppt.root}`);
-
         if (!!sppt.root) {
-            if (sppt.root.isLeaf) {
-                return this.transformLeaf(sppt.root as SPPTLeaf) as unknown as SimpleExampleType;
-            } else if (sppt.root.isBranch) {
-                return this.transformBranch(sppt.root as SPPTBranch) as unknown as SimpleExampleType;
-            }
+            return this.transformNode(sppt.root) as unknown as SimpleExampleType;
+        }
+        return null;
+    }
+
+    private transformNode(sppt: SPPTNode): SimpleExampleType{
+        console.log("transform " + sppt.name)
+        if (sppt.isLeaf) {
+            return this.transformLeaf(sppt as SPPTLeaf) as unknown as SimpleExampleType;
+        } else if (sppt.isBranch) {
+            return this.transformBranch(sppt as SPPTBranch) as unknown as SimpleExampleType;
         }
         return null;
     }
@@ -64,23 +69,24 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
                 return this.definition(branch, branch.children.toArray());
             }
             case "classDefinition" : {
-                return this.classDefinition(branch, branch.children);
+                return this.classDefinition(branch, branch.children.toArray());
             }
             case "propertyDefinition" : {
-                return this.propertyDefinition(branch, branch.children);
+                return this.propertyDefinition(branch, branch.children.toArray());
             }
             case "methodDefinition" : {
-                return this.methodDefinition(branch, branch.children);
+                return this.methodDefinition(branch, branch.children.toArray());
             }
             case "parameterDefinition" : {
-                return this.parameterDefinition(branch, branch.children);
+                return this.parameterDefinition(branch, branch.children.toArray());
             }
             default : {
                 // don't know what the default case should be
                 // are there children that do not have a name ????
                 var res: SimpleExampleType[] = [];
                 for (const child of branch.children.toArray()) {
-                    res.push(this.transform(child));
+                    res.push(this.transformNode(child));
+                    console.log(child.name);
                 }
                 return res[0];
             }
@@ -96,16 +102,16 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
     unit(target: SPPTBranch, children: SPPTBranch[]): SimpleExampleUnit {
         let result: SimpleExampleUnit = new SimpleExampleUnit();
         for (const child of children) {
-            child.branchNonSkipChildren.toArray().map(it =>
-                result.definitions.push(this.transform<Definition>(it))
-            );
+            for (const it of child.branchNonSkipChildren.toArray()) {
+                result.definitions.push(this.transformNode(it))
+            }
         }
         return result;
     }
 
     // definition = classDefinition ;
     definition(target: SPPTBranch, children: SPPTBranch[]): Definition {
-        return this.classDefinition(target, children);
+        return this.transformNode(children[0]);
     }
 
     // classDefinition =
@@ -116,15 +122,23 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
     //            ;
     classDefinition(target: SPPTBranch, children: SPPTBranch[]): ClassDefinition {
         let name = children[0].nonSkipMatchedText;
-        let propertyDefinitionList = children[1].branchNonSkipChildren.map (it =>
-            this.transform<PropertyDefinition>(it)
-        );
-        let methodDefinitionList = children[2].branchNonSkipChildren.map (it =>
-            this.transform<MethodDefinition>(it)
-        );
+        console.log(`NAME NAME: ${name}`);
+        let content: SimpleExampleType = null;
+        for (const child of children) {
+            // for (const it of child.branchNonSkipChildren.toArray()) {
+            content = this.transformNode(child);
+            // console.log(`typeof content ${typeof content}`);
+            // }
+        }
+        // children[2].branchNonSkipChildren.toArray().map (it =>
+        //     classDefinition.properties.push(this.transformNode(it) as PropertyDefinition)
+        // );
+        // let methodDefinitionList = children[3].branchNonSkipChildren.toArray().map (it =>
+        //     this.transformNode(it)
+        // );
         let classDefinition = new ClassDefinition(name);
-        classDefinition.properties.push(propertyDefinitionList);
-        classDefinition.methods.push(methodDefinitionList);
+        // classDefinition.properties.push(...propertyDefinitionList);
+        // classDefinition.methods.push(...methodDefinitionList);
         return classDefinition;
     }
 
