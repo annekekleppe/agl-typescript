@@ -43,24 +43,16 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
     }
 
     transform<SimpleExampleType>(sppt: SharedPackedParseTree): SimpleExampleType {
-        console.log(`sppt: ${sppt.root.name}, maxNumHeads: ${sppt.maxNumHeads}, countTrees: ${sppt.countTrees}, root: ${sppt.root}`);
+        console.log(`sppt: ${sppt.root?.name}, maxNumHeads: ${sppt.maxNumHeads}, countTrees: ${sppt.countTrees}, root: ${sppt.root}`);
 
         if (!!sppt.root) {
-            return this.transformNode(sppt.root) as unknown as SimpleExampleType;
-        } else {
-            return null;
+            if (sppt.root.isLeaf) {
+                return this.transformLeaf(sppt.root as SPPTLeaf) as unknown as SimpleExampleType;
+            } else if (sppt.root.isBranch) {
+                return this.transformBranch(sppt.root as SPPTBranch) as unknown as SimpleExampleType;
+            }
         }
-    }
-
-    private transformNode(node: SPPTNode): SimpleExampleType  {
-        if (node.isLeaf) {
-            return this.transformLeaf(node as SPPTLeaf);
-        } else if (node.isBranch) {
-            return this.transformBranch(node as SPPTBranch);
-        } else {
-            //should error
-            return null;
-        }
+        return null;
     }
 
     private transformBranch(branch: SPPTBranch): SimpleExampleType {
@@ -84,33 +76,36 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
                 return this.parameterDefinition(branch, branch.children);
             }
             default : {
-                // var res: SimpleExampleType[] = [];
-                // for (const child of branch.children.toArray()) {
-                //     res.push(this.transformNode(child));
-                // }
-                // return res;
+                // don't know what the default case should be
+                // are there children that do not have a name ????
+                var res: SimpleExampleType[] = [];
+                for (const child of branch.children.toArray()) {
+                    res.push(this.transform(child));
+                }
+                return res[0];
             }
         }
         return null;
     }
 
-    private transformLeaf(leaf: SPPTLeaf, arg?: any): SimpleExampleType {
+    private transformLeaf(leaf: SPPTLeaf): SimpleExampleType {
         return new Leaf(leaf.matchedText);
     }
 
     // unit = definition* ;
     unit(target: SPPTBranch, children: SPPTBranch[]): SimpleExampleUnit {
         let result: SimpleExampleUnit = new SimpleExampleUnit();
-        let definitions = children[0].branchNonSkipChildren.toArray().map(it =>
-            child => this.transform<Definition>(it)
-        );
-        result.definitions.push(...definitions);
+        for (const child of children) {
+            child.branchNonSkipChildren.toArray().map(it =>
+                result.definitions.push(this.transform<Definition>(it))
+            );
+        }
         return result;
     }
 
     // definition = classDefinition ;
     definition(target: SPPTBranch, children: SPPTBranch[]): Definition {
-        return this.transformBranch(children[0]);
+        return this.classDefinition(target, children);
     }
 
     // classDefinition =
