@@ -14,13 +14,28 @@
  * limitations under the License.
  */
 
-export class SimpleExampleUnit {
-    definition: Definition[] = [];
+export interface SimpleExampleType {
+    treeToString(): string;
 }
 
-export abstract class Definition {}
+export class SimpleExampleUnit implements SimpleExampleType {
+    definitions: Definition[] = [];
 
-export class ClassDefinition extends Definition {
+    treeToString() : string {
+        return this.definitions.map(def => {
+            console.log("Def [" + def + "]");
+            return def.treeToString()
+        }).join("\n\n");
+    }
+}
+
+export abstract class Definition implements SimpleExampleType {
+    treeToString() : string {
+        return "Should be implemented by subclass";
+    }
+}
+
+export class ClassDefinition extends Definition implements SimpleExampleType {
     name: String;
     properties: PropertyDefinition[] = [];
     // properties = mutableListOf<PropertyDefinition>();
@@ -32,27 +47,42 @@ export class ClassDefinition extends Definition {
         super();
         this.name = name;
     }
+    treeToString() : string {
+        return `
+        ${this.name}
+        ${this.properties.map(p => p.treeToString()).join("\n")}
+        ${this.methods.map(p => p.treeToString()).join("\n")}
+        `;
+    }
 }
 
-export class PropertyDefinition {
+export class PropertyDefinition implements SimpleExampleType {
     name: String;
     typeName: String;
     constructor(name: string, typeName: string) {
         this.name = name;
         this.typeName = typeName;
     }
+
+    treeToString() : string {
+        return `${this.name} : ${this.typeName}`;
+    }
 }
 
-export class ParameterDefinition {
+export class ParameterDefinition implements SimpleExampleType {
     name: String;
     typeName: String;
     constructor(name: string, typeName: string) {
         this.name = name;
         this.typeName = typeName;
     }
+
+    treeToString() : string {
+        return `${this.name} : ${this.typeName}`;
+    }
 }
 
-export class MethodDefinition {
+export class MethodDefinition implements SimpleExampleType {
     name: String;
     paramList:ParameterDefinition[] = [];
     body: Statement[] = []; // mutableListOf<Statement>();
@@ -60,26 +90,62 @@ export class MethodDefinition {
         this.name = name;
         this.paramList.push(...paramList);
     }
+
+    treeToString() : string {        
+        return `${this.name} ( ${this.paramList.map(p => p.treeToString()).join(", ")} )
+        ${this.body.map(p => p.treeToString()).join(";\n")}`;
+    }
 }
 
-export abstract class Statement {}
+export abstract class Statement implements SimpleExampleType {
+    treeToString() : string {
+        throw new Error("Method not implemented.");
+    }
+}
 
-export class StatementReturn extends Statement {
+export class StatementReturn extends Statement{
     expression: Expression;
+    treeToString() : string {
+        return this.expression.treeToString();
+    }
 }
 
-export abstract class Expression {}
+export abstract class Expression implements SimpleExampleType {
+    treeToString() : string {
+        throw new Error("Method not implemented.");
+    }
+}
 
 export class ExpressionLiteral extends Expression {
     value: any;
+    treeToString() : string {
+        return this.value;
+    }
 }
 
-export class ExpressionVariableReference {
-    value: String;
+export class ExpressionVariableReference implements SimpleExampleType {
+    value: string;
+    treeToString() : string {
+        return this.value;
+    }
 }
 
 export class ExpressionInfixOperator extends Expression {
     lhs: Expression;
-    operator: String;
+    operator: string;
     rhs: Expression;
+    treeToString() : string {
+        return `${this.lhs.treeToString()} ${this.operator} ${this.rhs.treeToString()}`;
+    }
+}
+
+// for now, as test
+export class Leaf implements SimpleExampleType {
+    content: string;
+    constructor(content: string) {
+        this.content = content;
+    }
+    treeToString() : string {
+        return this.content;
+    }
 }

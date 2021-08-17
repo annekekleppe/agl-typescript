@@ -20,10 +20,10 @@
 import {net} from "net.akehurst.language-agl-processor";
 import {
     ClassDefinition,
-    Definition,
+    Definition, Leaf,
     MethodDefinition,
     ParameterDefinition,
-    PropertyDefinition,
+    PropertyDefinition, SimpleExampleType,
     SimpleExampleUnit
 } from "./ASM_TypeDefinitions";
 import SyntaxAnalyser = net.akehurst.language.api.syntaxAnalyser.SyntaxAnalyser;
@@ -54,7 +54,7 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         }
     }
 
-    private transformNode(node: SPPTNode, arg?: any): string {
+    private transformNode(node: SPPTNode, arg?: any): any {
         if (node.isLeaf) {
             return this.transformLeaf(node as SPPTLeaf, arg)
         } else if (node.isBranch) {
@@ -65,17 +65,93 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         }
     }
 
-    private transformBranch(branch: SPPTBranch, arg?: any): string {
-        var res = `branch ${branch.name} \n`;
-        for (const child of branch.children.toArray()) {
-            res += this.transformNode(child, arg);
-            res+='\n';
+    private transformBranch(branch: SPPTBranch, arg?: any): any {
+        var brName = branch.name;
+        if('unit' == brName) {
+            return this.unit(branch)
+        } else if ('definition' == brName) {
+            return this.definition(branch)
+        } else if ('classDefinition' == brName) {
+            return this.classDefinition(branch)
+        } else if ('propertyDefinition' == brName) {
+            return this.propertyDefinition(branch)
+        } else if ('methodDefinition' == brName) {
+            return this.methodDefinition(branch)
+        } else if ('parameterDefinition' == brName) {
+            return this.parameterDefinition(branch)
+        } else {
+            throw `Error: ${brName} not handled`;
         }
-        return res;
+
     }
 
     private transformLeaf(leaf: SPPTLeaf, arg?: any): string {
-        return `leaf ${leaf.matchedText}`;
+        return leaf.matchedText;
     }
 
+    // unit = definition* ;
+    unit(branch: SPPTBranch): SimpleExampleUnit {
+        let result: SimpleExampleUnit = new SimpleExampleUnit();
+        for (const child of branch.branchNonSkipChildren.toArray()[0].branchNonSkipChildren.toArray()) {
+            const def = this.transformNode(child);
+            result.definitions.push(def);
+        }
+        return result;
+    }
+
+    // definition = classDefinition ;
+    definition(branch: SPPTBranch): Definition {
+        return this.transformNode(branch.branchNonSkipChildren.toArray()[0]);
+    }
+
+    /*
+    classDefinition =
+        'class' NAME '{'
+            propertyDefinition*
+            methodDefinition*
+        '}'
+    ;
+     */
+    classDefinition(branch:SPPTBranch): ClassDefinition {
+        const name = branch.branchNonSkipChildren.toArray()[0].matchedText;
+        const asm = new ClassDefinition(name);
+        for(const pCh of branch.branchNonSkipChildren.toArray()[1].branchNonSkipChildren.toArray()) {
+            const pDef = this.transformBranch(pCh);
+            asm.properties.push(pDef);
+        }
+        for(const mCh of branch.branchNonSkipChildren.toArray()[2].branchNonSkipChildren.toArray()) {
+            const mDef = this.transformBranch(mCh);
+            asm.methods.push(mDef);
+        }
+        return asm;
+    }
+
+    //propertyDefinition = NAME ':' NAME ;
+    propertyDefinition(branch: SPPTBranch): PropertyDefinition {
+        let name = branch.branchNonSkipChildren.toArray()[0].nonSkipMatchedText;
+        let typeName = branch.branchNonSkipChildren.toArray()[1].nonSkipMatchedText;
+        return new PropertyDefinition(name, typeName);
+    }
+
+    //methodDefinition = NAME '(' parameterList ')' body ;
+    //parameterList = [ parameterDefinition / ',']* ;
+    methodDefinition(branch: SPPTBranch): MethodDefinition {
+        let name = branch.branchNonSkipChildren.toArray()[0].nonSkipMatchedText
+        let paramList = branch.branchNonSkipChildren.toArray()[1].branchNonSkipChildren.toArray()[0].branchNonSkipChildren.toArray().map (it =>
+            this.transformNode(it)
+        )
+        let method = new MethodDefinition(name, paramList);
+        // body!
+        return method;
+    }
+
+
+    //parameterDefinition = NAME ':' NAME ;
+    parameterDefinition(branch: SPPTBranch): ParameterDefinition {
+        let name = branch.branchNonSkipChildren.toArray()[0].nonSkipMatchedText;
+        let typeName = branch.branchNonSkipChildren.toArray()[1].nonSkipMatchedText;
+        return new ParameterDefinition(name, typeName);
+    }
+
+    //body = '{' statement* '}' ;
 }

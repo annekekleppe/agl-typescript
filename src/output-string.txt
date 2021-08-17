@@ -1,0 +1,170 @@
+// Saved output from David's version in main branch
+sppt: unit, maxNumHeads: 2, countTrees: 1, root: 0,131:unit(6)
+branch unit
+branch WHITE_SPACE
+leaf
+
+
+branch §unit§multi0
+branch definition
+branch classDefinition
+leaf class
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf David
+branch WHITE_SPACE
+leaf
+
+
+leaf {
+branch WHITE_SPACE
+leaf
+
+
+branch §classDefinition§multi1
+branch propertyDefinition
+branch NAME
+leaf property
+branch WHITE_SPACE
+leaf
+
+
+leaf :
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf String
+branch WHITE_SPACE
+leaf
+
+
+
+
+branch propertyDefinition
+branch NAME
+leaf prop2
+branch WHITE_SPACE
+leaf
+
+
+leaf :
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf Integer
+branch WHITE_SPACE
+leaf
+
+
+
+
+
+branch §classDefinition§multi2
+branch methodDefinition
+branch NAME
+leaf method
+
+leaf (
+branch parameterList
+branch §parameterList§sList0
+branch parameterDefinition
+branch NAME
+leaf p1
+
+leaf :
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf Integer
+
+
+leaf ,
+branch WHITE_SPACE
+leaf
+
+branch parameterDefinition
+branch NAME
+leaf p2
+
+leaf :
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf String
+
+
+
+
+leaf )
+branch WHITE_SPACE
+leaf
+
+branch body
+leaf {
+branch WHITE_SPACE
+leaf
+
+
+branch propertyDefinition
+branch NAME
+leaf x1
+
+leaf :
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf String
+branch WHITE_SPACE
+leaf
+
+
+
+
+leaf }
+branch WHITE_SPACE
+leaf
+
+
+
+
+
+leaf }
+branch WHITE_SPACE
+leaf
+
+
+
+
+branch definition
+branch classDefinition
+leaf class
+branch WHITE_SPACE
+leaf
+
+branch NAME
+leaf Anneke
+branch WHITE_SPACE
+leaf
+
+
+leaf {
+branch WHITE_SPACE
+leaf
+
+
+branch §classDefinition§multi1
+leaf
+
+branch §classDefinition§multi2
+leaf
+
+leaf }
+branch WHITE_SPACE
+leaf
