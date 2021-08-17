@@ -54,7 +54,7 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         }
     }
 
-    private transformNode(node: SPPTNode, arg?: any): string {
+    private transformNode(node: SPPTNode, arg?: any): any {
         if (node.isLeaf) {
             return this.transformLeaf(node as SPPTLeaf, arg)
         } else if (node.isBranch) {
@@ -65,17 +65,32 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         }
     }
 
-    private transformBranch(branch: SPPTBranch, arg?: any): string {
-        var res = `branch ${branch.name} \n`;
-        for (const child of branch.children.toArray()) {
-            res += this.transformNode(child, arg);
-            res+='\n';
+    private transformBranch(branch: SPPTBranch, arg?: any): any {
+        var brName = branch.name;
+        if('unit' == brName) {
+            return this.unit(branch.branchNonSkipChildren.toArray())
+        } else if ('definition' == brName) {
+        } else if ('classDefinition' == brName) {
+        } else if ('propertyDefinition' == brName) {
+        } else if ('methodDefinition' == brName) {
+
+        } else {
+            throw `Error: $brName not handled`;
         }
-        return res;
+
     }
 
     private transformLeaf(leaf: SPPTLeaf, arg?: any): string {
         return `leaf ${leaf.matchedText}`;
     }
 
+
+    private unit(children: Array<SPPTBranch>):SimpleExampleUnit {
+        var asm = new SimpleExampleUnit();
+        for(const ch of children) {
+            const def = this.transformBranch(ch);
+            asm.definition.push(def);
+        }
+        return asm;
+    }
 }
