@@ -20,19 +20,17 @@
 import {net} from "net.akehurst.language-agl-processor";
 import {
     ClassDefinition,
-    Definition,
+    Definition, Leaf,
     MethodDefinition,
     ParameterDefinition,
-    PropertyDefinition,
+    PropertyDefinition, SimpleExampleType,
     SimpleExampleUnit
 } from "./ASM_TypeDefinitions";
 import SyntaxAnalyser = net.akehurst.language.api.syntaxAnalyser.SyntaxAnalyser;
-import SyntaxAnalyserException = net.akehurst.language.api.syntaxAnalyser.SyntaxAnalyserException;
 import SharedPackedParseTree = net.akehurst.language.api.sppt.SharedPackedParseTree;
 import SPPTBranch = net.akehurst.language.api.sppt.SPPTBranch;
 import SPPTLeaf = net.akehurst.language.api.sppt.SPPTLeaf;
 import SPPTNode = net.akehurst.language.api.sppt.SPPTNode;
-import SyntaxAnalyserAbstract = net.akehurst.language.agl.syntaxAnalyser.SyntaxAnalyserAbstract;
 
 export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
     constructor() {
@@ -44,38 +42,132 @@ export class SimpleExampleSyntaxAnalyser implements SyntaxAnalyser {
         throw new Error("Method not implemented.");
     }
 
-    transform<T>(sppt: SharedPackedParseTree): T {
-        console.log(`sppt: ${sppt.root.name}, maxNumHeads: ${sppt.maxNumHeads}, countTrees: ${sppt.countTrees}, root: ${sppt.root}`);
-
+    transform<SimpleExampleType>(sppt: SharedPackedParseTree): SimpleExampleType {
+        console.log(`sppt: ${sppt.root?.name}, maxNumHeads: ${sppt.maxNumHeads}, countTrees: ${sppt.countTrees}, root: ${sppt.root}`);
         if (!!sppt.root) {
-            return this.transformNode(sppt.root) as unknown as T;
-        } else {
-            return null;
+            return this.transformNode(sppt.root) as unknown as SimpleExampleType;
         }
+        return null;
     }
 
-    private transformNode(node: SPPTNode, arg?: any): string {
-        if (node.isLeaf) {
-            return this.transformLeaf(node as SPPTLeaf, arg)
-        } else if (node.isBranch) {
-            return this.transformBranch(node as SPPTBranch, arg)
-        } else {
-            //should error
-            return null;
+    private transformNode(sppt: SPPTNode): SimpleExampleType{
+        console.log("transform " + sppt.name)
+        if (sppt.isLeaf) {
+            return this.transformLeaf(sppt as SPPTLeaf) as unknown as SimpleExampleType;
+        } else if (sppt.isBranch) {
+            return this.transformBranch(sppt as SPPTBranch) as unknown as SimpleExampleType;
         }
+        return null;
     }
 
-    private transformBranch(branch: SPPTBranch, arg?: any): string {
-        var res = `branch ${branch.name} \n`;
-        for (const child of branch.children.toArray()) {
-            res += this.transformNode(child, arg);
-            res+='\n';
+    private transformBranch(branch: SPPTBranch): SimpleExampleType {
+        switch (branch.name) {
+            case "unit" : {
+                return this.unit(branch, branch.children.toArray());
+            }
+            case "definition" : {
+                return this.definition(branch, branch.children.toArray());
+            }
+            case "classDefinition" : {
+                return this.classDefinition(branch, branch.children.toArray());
+            }
+            case "propertyDefinition" : {
+                return this.propertyDefinition(branch, branch.children.toArray());
+            }
+            case "methodDefinition" : {
+                return this.methodDefinition(branch, branch.children.toArray());
+            }
+            case "parameterDefinition" : {
+                return this.parameterDefinition(branch, branch.children.toArray());
+            }
+            default : {
+                // don't know what the default case should be
+                // are there children that do not have a name ????
+                var res: SimpleExampleType[] = [];
+                for (const child of branch.children.toArray()) {
+                    res.push(this.transformNode(child));
+                    console.log(child.name);
+                }
+                return res[0];
+            }
         }
-        return res;
+        return null;
     }
 
-    private transformLeaf(leaf: SPPTLeaf, arg?: any): string {
-        return `leaf ${leaf.matchedText}`;
+    private transformLeaf(leaf: SPPTLeaf): SimpleExampleType {
+        return new Leaf(leaf.matchedText);
     }
 
+    // unit = definition* ;
+    unit(target: SPPTBranch, children: SPPTBranch[]): SimpleExampleUnit {
+        let result: SimpleExampleUnit = new SimpleExampleUnit();
+        for (const child of children) {
+            for (const it of child.branchNonSkipChildren.toArray()) {
+                result.definitions.push(this.transformNode(it))
+            }
+        }
+        return result;
+    }
+
+    // definition = classDefinition ;
+    definition(target: SPPTBranch, children: SPPTBranch[]): Definition {
+        return this.transformNode(children[0]);
+    }
+
+    // classDefinition =
+    //                'class' NAME '{'
+    //                    propertyDefinition*
+    //                    methodDefinition*
+    //                '}'
+    //            ;
+    classDefinition(target: SPPTBranch, children: SPPTBranch[]): ClassDefinition {
+        let name = children[0].nonSkipMatchedText;
+        console.log(`NAME NAME: ${name}`);
+        let content: SimpleExampleType = null;
+        for (const child of children) {
+            // for (const it of child.branchNonSkipChildren.toArray()) {
+            content = this.transformNode(child);
+            // console.log(`typeof content ${typeof content}`);
+            // }
+        }
+        // children[2].branchNonSkipChildren.toArray().map (it =>
+        //     classDefinition.properties.push(this.transformNode(it) as PropertyDefinition)
+        // );
+        // let methodDefinitionList = children[3].branchNonSkipChildren.toArray().map (it =>
+        //     this.transformNode(it)
+        // );
+        let classDefinition = new ClassDefinition(name);
+        // classDefinition.properties.push(...propertyDefinitionList);
+        // classDefinition.methods.push(...methodDefinitionList);
+        return classDefinition;
+    }
+
+    //propertyDefinition = NAME ':' NAME ;
+    propertyDefinition(target: SPPTBranch, children: SPPTBranch[]): PropertyDefinition {
+        let name = children[0].nonSkipMatchedText;
+        let typeName = children[1].nonSkipMatchedText;
+        return new PropertyDefinition(name, typeName);
+    }
+
+    //methodDefinition = NAME '(' parameterList ')' body ;
+    //parameterList = [ parameterDefinition / ',']* ;
+    methodDefinition(target: SPPTBranch, children: SPPTBranch[]): MethodDefinition {
+        let name = children[0].nonSkipMatchedText
+        let paramList = children[1].branchNonSkipChildren[0].branchNonSkipChildren.map (it =>
+            this.transform<ParameterDefinition>(it)
+        )
+        let method = new MethodDefinition(name, paramList);
+        // body!
+        return method;
+    }
+
+
+    //parameterDefinition = NAME ':' NAME ;
+    parameterDefinition(target: SPPTBranch, children: SPPTBranch[]): ParameterDefinition {
+        let name = children[0].nonSkipMatchedText;
+        let typeName = children[1].nonSkipMatchedText;
+        return new ParameterDefinition(name, typeName);
+    }
+
+    //body = '{' statement* '}' ;
 }
