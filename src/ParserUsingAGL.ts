@@ -4,6 +4,7 @@ import { SimpleExampleSyntaxAnalyser } from "./SimpleExampleSyntaxAnalyser";
 import LanguageProcessor = net.akehurst.language.api.processor.LanguageProcessor;
 import Agl = net.akehurst.language.agl.processor.Agl;
 import AutomatonKind_api = net.akehurst.language.api.processor.AutomatonKind_api;
+import {SimpleExampleUnit} from "./ASM_TypeDefinitions";
 // const Agl = agl_module.net.akehurst.language.agl.processor.Agl; // define a short name
 
 export class ParserUsingAGL {
@@ -51,7 +52,8 @@ class Anneke {
         //console.info(sppt.toStringAllWithIndent('  '));
 
         let asm = this.proc.process(null, sentence, AutomatonKind_api.LOOKAHEAD_1);
-        console.info(typeof asm);
+        // console.info(typeof asm);
+        // console.info((asm as SimpleExampleUnit).treeToString());
         console.info(asm);
         //
         // let formatted = this.proc.formatAsm(asm)
