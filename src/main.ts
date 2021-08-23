@@ -1,4 +1,9 @@
-import {ParserUsingAGL} from "./ParserUsingAGL";
+// use this import statement to switch between the various examples
+import {ParserUsingAGL} from "./pi-example/ParserUsingAGL";
 
 const main = new ParserUsingAGL();
-main.doIt();
+try {
+    main.doIt();
+} catch (e) {
+    console.log(e.message);
+}
