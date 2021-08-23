@@ -4,37 +4,11 @@ import { SimpleExampleSyntaxAnalyser } from "./SimpleExampleSyntaxAnalyser";
 import LanguageProcessor = net.akehurst.language.api.processor.LanguageProcessor;
 import Agl = net.akehurst.language.agl.processor.Agl;
 import AutomatonKind_api = net.akehurst.language.api.processor.AutomatonKind_api;
-import {SimpleExampleUnit} from "./ASM_TypeDefinitions";
-// const Agl = agl_module.net.akehurst.language.agl.processor.Agl; // define a short name
+import {grammarStr} from "./Grammar";
 
 export class ParserUsingAGL {
-    grammarStr = `
-namespace test
-grammar SimpleExample {
-    skip WHITE_SPACE = "\\s+" ;
-    skip MULTI_LINE_COMMENT = "/\\*[^*]*\\*+(?:[^*/][^*]*\\*+)*/" ;
-    skip SINGLE_LINE_COMMENT = "//.*?$" ;
-    unit = definition* ;
-    definition = classDefinition ;
-    classDefinition =
-        'class' NAME '{'
-            propertyDefinition*
-            methodDefinition*
-        '}'
-    ;
-    propertyDefinition = NAME ':' NAME ;
-    methodDefinition = NAME '(' parameterList ')' body ;
-    parameterList = [ parameterDefinition / ',']* ;
-    parameterDefinition = NAME ':' NAME ;
-    body = '{' propertyDefinition '}' ;
-    NAME = "[a-zA-Z_][a-zA-Z0-9_]*" ;
-    BOOLEAN = "true | false" ;
-    NUMBER = "[0-9]+([.][0-9]+)?" ;
-    STRING = "'(?:\\\\?.)*?'" ;
-}
-`;
     analyser = new SimpleExampleSyntaxAnalyser();
-    proc: LanguageProcessor  = Agl.processorFromString(this.grammarStr, this.analyser, null, null);
+    proc: LanguageProcessor  = Agl.processorFromString(grammarStr, this.analyser, null, null);
 
     doIt() {
         let sentence = `
