@@ -1,5 +1,5 @@
 model Simple {
-    Entity ent1 { 
+    Entity ent1 {
         myTextAttribute : String
         method meth56 ( ): Integer { 
             "45" 

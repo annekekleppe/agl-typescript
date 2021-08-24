@@ -5,5 +5,5 @@ const main = new ParserUsingAGL();
 try {
     main.doIt();
 } catch (e) {
-    console.log(e.message);
+    console.log("main: " + e.message);
 }

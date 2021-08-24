@@ -128,15 +128,15 @@ leaf booleanLiteral      = 'false' | 'true';
 
 
 /* TODO the following rules do not work in AGL
-varLetter           = '[a-zA-Z]';
-identifierChar      = '[a-zA-Z0-9_$]'; // any char but not /.,!?@~%^&*-=+(){}'':;<>?[]'/
-anyChar             = '[a-zA-Z0-9' /\-\[\]\'+<>=#$_.,!?@~%^&\*-=(){}:;<>?]';
-number              = '[0-9]';
+varLetter1           = '[a-zA-Z]';
+identifierChar1      = '[a-zA-Z0-9_$]'; // any char but not /.,!?@~%^&*-=+(){}'':;<>?[]'/
+anyChar1             = '[a-zA-Z0-9' /\-\[\]\'+<>=#$_.,!?@~%^&\*-=(){}:;<>?]';
+number1              = '[0-9]';
 
-leaf variable            = varLetter identifierChar*;
-leaf stringLiteral       = '"' anyChar* '"';
-leaf numberLiteral       = number+;
-leaf booleanLiteral      = 'false' | 'true';
+leaf variable1            = varLetter identifierChar*;
+leaf stringLiteral1       = '"' anyChar* '"';
+leaf numberLiteral1       = number+;
+leaf booleanLiteral1      = 'false' | 'true';
 */
 //TODO extend anyChar with ? + *
 /* TODO see whether the rest of the rules in pegjs can be replaced by the rules in the prefix */

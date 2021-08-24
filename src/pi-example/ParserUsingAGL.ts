@@ -31,16 +31,18 @@ export class ParserUsingAGL {
 
     doIt() {
         if (this.proc) {
-            // let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/Simple.exm");
+            let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/Simple.exm");
             // let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/SomeNameOrOther.exm");
-            let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/SecondTry.exm");
+            // let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/SecondTry.exm");
             //let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/LargeUnit.exm");
 
             let sppt = this.proc.parse(sentence);
             // console.info(sppt);
 
             let asm = this.proc.process(null, sentence, AutomatonKind_api.LOOKAHEAD_1);
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++++++")
             console.info(this.writer.writeToString(asm as ExampleEveryConcept, 0, false));
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++++++")
         }
     }
 }

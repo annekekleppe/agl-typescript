@@ -7,7 +7,7 @@ import {GrammarHandler} from "../GrammarHandler";
 import {FileHandler} from "../FileHandler";
 
 export class ParserUsingAGL {
-    // analyser = new PiExampleSyntaxAnalyser();
+    // analyser = new PiMetaSyntaxAnalyser();
     analyser = null;
     proc: LanguageProcessor = null;
     fileHandler: FileHandler = new FileHandler();

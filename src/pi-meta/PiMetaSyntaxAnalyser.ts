@@ -5,12 +5,8 @@ import SPPTBranch = net.akehurst.language.api.sppt.SPPTBranch;
 import SPPTLeaf = net.akehurst.language.api.sppt.SPPTLeaf;
 import SPPTNode = net.akehurst.language.api.sppt.SPPTNode;
 
-import {
-    Entity,
-    ExModel
-} from "./language/gen";
 
-export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
+export class PiMetaSyntaxAnalyser implements SyntaxAnalyser {
     constructor() {
     }
 
@@ -44,10 +40,10 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
 
     private transformBranch(branch: SPPTBranch, arg?: any): any {
         var brName = branch.name;
-        if('ExModel' == brName) {
-            return this.exmodel(branch)
-        } else if ('Entity' == brName) {
-            return this.entity(branch)
+        // if('ExModel' == brName) {
+        //     return this.exmodel(branch)
+        // } else if ('Entity' == brName) {
+        //     return this.entity(branch)
         // } else if ('classDefinition' == brName) {
         //     return this.classDefinition(branch)
         // } else if ('propertyDefinition' == brName) {
@@ -56,61 +52,15 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         //     return this.methodDefinition(branch)
         // } else if ('parameterDefinition' == brName) {
         //     return this.parameterDefinition(branch)
-        } else {
-            throw `Error: ${brName} not handled`;
-        }
+        // } else {
+        //     throw `Error: ${brName} not handled`;
+        // }
     }
 
     private transformLeaf(leaf: SPPTLeaf, arg?: any): string {
         return leaf.matchedText;
     }
 
-    // ExModel = 'model' variable '{'
-    // (Entity)*
-    // 'model' 'wide' 'Methods:'
-    // MethodList2
-    // '}' ;
-    exmodel(branch: SPPTBranch): ExModel {
-        console.log(`executing exmodel`);
-        let result: ExModel = new ExModel();
-        // variable
-        const name = branch.branchNonSkipChildren.toArray()[0].matchedText;
-        if (name) {
-            result.name = name;
-        } else {
-            result.name = "<noNameFound>";
-        }
-        // (Entity)*
-        for (const child of branch.branchNonSkipChildren.toArray()[1].branchNonSkipChildren.toArray()) {
-            let ent = null;
-            try {
-                ent = this.transformNode(child);
-            } catch (e) {
-                console.log(`ERROR: ${e.message}`);
-            }
-            if (ent) result.entities.push(ent);
-        }
-        // MethodList2
-        // const list = branch.branchNonSkipChildren.toArray()[2];
-        // result.methods.push(this.transformNode(list));
-        return result;
-    }
 
-    // Entity = 'Entity' variable ('base' EntityPiElemRef )? '{'
-    // AttributeList3
-    // MethodList4
-    // '}' ;
-    entity(branch: SPPTBranch): Entity {
-        console.log(`executing entity`);
-        let result: Entity = new Entity();
-        // variable
-        const name = branch.branchNonSkipChildren.toArray()[0].matchedText;
-        if (name) {
-            result.name = name;
-        } else {
-            result.name = "<noNameFound>";
-        }
-        return result;
-    }
 
 }

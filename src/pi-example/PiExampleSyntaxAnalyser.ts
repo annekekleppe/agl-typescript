@@ -44,6 +44,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
 
     private transformBranch(branch: SPPTBranch, arg?: any): any {
         var brName = branch.name;
+        console.log("Transfprm branch: " + brName)
         if('ExModel' == brName) {
             return this.exmodel(branch)
         } else if ('Entity' == brName) {
@@ -80,14 +81,16 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         } else {
             result.name = "<noNameFound>";
         }
+        console.log("name: " + name);
         // (Entity)*
-        for (const child of branch.branchNonSkipChildren.toArray()[1].branchNonSkipChildren.toArray()) {
+        for (const child of branch.branchNonSkipChildren.toArray()[0].branchNonSkipChildren.toArray()) {
             let ent = null;
             try {
                 ent = this.transformNode(child);
             } catch (e) {
-                console.log(`ERROR: ${e.message}`);
+                console.log(`exmodel ERROR: ${e.message}`);
             }
+            console.log("Entity found: " + ent?.name)
             if (ent) result.entities.push(ent);
         }
         // MethodList2
