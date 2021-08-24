@@ -18,7 +18,10 @@ E.g.
     PiConcept = PiExpressionConcept 
     / PiLimitedConcept
     / PiNormalConcept
-
+11. What is the 'namespace' variable at the start of the grammar?
+12. When skipping whitespace, is there a possibility to require whitespace, eg. "abstract root concept" instead of
+"abstractroot concept", or "abstract rootconcept".
+    
 ###On SyntaxAnalyser
 1. Why do I not get the error `Error: ${brName} not handled` (SyntaxAnalyser.transformBranch) when I have not
    yet defined a function to transform a certain type of node?

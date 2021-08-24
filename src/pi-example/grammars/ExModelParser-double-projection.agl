@@ -1,10 +1,16 @@
 // This file contains the grammar for the ProjectIt Example project
 
+namespace test
+grammar PiExample {
+    skip WHITE_SPACE = "\s+" ;
+    skip MULTI_LINE_COMMENT = "/\*[^*]*\*+(?:[^*/][^*]*\*+)*/" ;
+    skip SINGLE_LINE_COMMENT = "//.*?$" ;
+
 ExModel = 'model' variable '{'
 	(Entity)*
 	'model' 'wide' 'Methods:'
 	MethodList2
-	'}' ;
+	'}' "end" "of" variable ;
 
 Entity = 'Entity' variable ('base' EntityPiElemRef )? '{'
     	AttributeList3
@@ -52,13 +58,11 @@ LoopVariable = variable;
 
 MethodCallExpression = 'CALL' MethodPiElemRef '(' ExExpressionList6 ')' ;
 
-/*IfExpression = 'if' '(' ExExpression ')' 'then'
+IfExpression = 'if' '(' ExExpression ')' 'then' 
 	ExExpression
 	'else' 
 	ExExpression
 	'endif';
-	*/
-IfExpression = ExExpression '?'  ExExpression ':' ExExpression ;
 
 BinaryExpression = MultiplyExpression
     | PlusExpression

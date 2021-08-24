@@ -3,7 +3,7 @@ import {net} from "net.akehurst.language-agl-processor";
 import LanguageProcessor = net.akehurst.language.api.processor.LanguageProcessor;
 import Agl = net.akehurst.language.agl.processor.Agl;
 import AutomatonKind_api = net.akehurst.language.api.processor.AutomatonKind_api;
-import {GrammarHandler} from "./GrammarHandler";
+import {GrammarHandler} from "../GrammarHandler";
 import {FileHandler} from "../FileHandler";
 import {PiExampleSyntaxAnalyser} from "./PiExampleSyntaxAnalyser";
 import {ExampleEveryConcept} from "./language/gen";
@@ -17,8 +17,12 @@ export class ParserUsingAGL {
     grammarHandler: GrammarHandler = new GrammarHandler();
 
     constructor() {
+        const filepath: string = "src/pi-example/grammars/ExModelParser.agl";
+        // const filepath: string = "src/pi-example/grammars/ExModelParser-double-projection.agl";
+        // const filepath: string = "src/pi-example/grammars/ExModelParser-left-recursion.agl";
+
         try {
-            this.proc = Agl.processorFromString(this.grammarHandler.getGrammar(), this.analyser, null, null);
+            this.proc = Agl.processorFromString(this.grammarHandler.getGrammar(filepath), this.analyser, null, null);
         } catch (e) {
             console.log(e.message);
         }
