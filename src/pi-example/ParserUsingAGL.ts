@@ -17,9 +17,10 @@ export class ParserUsingAGL {
     grammarHandler: GrammarHandler = new GrammarHandler();
 
     constructor() {
-        const filepath: string = "src/pi-example/grammars/ExModelParser.agl";
+        // const filepath: string = "src/pi-example/grammars/ExModelParser.agl";
         // const filepath: string = "src/pi-example/grammars/ExModelParser-double-projection.agl";
         // const filepath: string = "src/pi-example/grammars/ExModelParser-left-recursion.agl";
+        const filepath: string = "src/pi-example/grammars/Fixed.agl";
 
         try {
             this.proc = Agl.processorFromString(this.grammarHandler.getGrammar(filepath), this.analyser, null, null);
@@ -31,8 +32,8 @@ export class ParserUsingAGL {
 
     doIt() {
         if (this.proc) {
-            let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/Simple.exm");
-            // let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/SomeNameOrOther.exm");
+            // let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/Simple.exm");
+            let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/SomeNameOrOther.exm");
             // let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/SecondTry.exm");
             //let sentence: string = this.fileHandler.stringFromFile("src/pi-example/sentences/LargeUnit.exm");
 
