@@ -1,5 +1,5 @@
 // use this import statement to switch between the various examples
-import {ParserUsingAGL} from "./pi-meta/ParserUsingAGL";
+import {ParserUsingAGL} from "./pi-example/ParserUsingAGL";
 
 const main = new ParserUsingAGL();
 try {

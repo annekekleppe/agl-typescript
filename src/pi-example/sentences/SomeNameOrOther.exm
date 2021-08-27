@@ -6,7 +6,7 @@ model SomeNameOrOther {
 
         qwerty : String
         method meth56 ( ): Integer { 
-            ( ( ( "23" * "56" ) / "45" ) + "458" ) 
+            ( ( ( 23 * 56 ) / 45 ) + 458 )
         }
 
         method meth000 ( par1 : String,par2 : ent1): Integer { 
@@ -19,12 +19,12 @@ model SomeNameOrOther {
 
         age : Integer
         method meth876 ( ): Boolean { 
-            ( "true" and "false" )
+            ( true and false )
         }
     }
 
 model wide Methods: 
     method meth21 ( ): Integer { 
-        "786" 
+        786
     }
 }

@@ -75,7 +75,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         console.log(`executing exmodel`);
         let result: ExModel = new ExModel();
         // variable
-        const name = branch.branchNonSkipChildren.toArray()[0].matchedText;
+        const name = branch.nonSkipChildren.toArray()[1].matchedText;
         if (name) {
             result.name = name;
         } else {
@@ -83,14 +83,15 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         }
         console.log("name: " + name);
         // (Entity)*
-        for (const child of branch.branchNonSkipChildren.toArray()[0].branchNonSkipChildren.toArray()) {
+        // entities = this.transformEntities()
+        // branch.children(0)
+        for (const child of branch.nonSkipChildren.toArray()[3].nonSkipChildren.toArray()[0].nonSkipChildren.toArray()[0].branchNonSkipChildren.toArray()) {
             let ent = null;
             try {
                 ent = this.transformNode(child);
             } catch (e) {
                 console.log(`exmodel ERROR: ${e.message}`);
             }
-            console.log("Entity found: " + ent?.name)
             if (ent) result.entities.push(ent);
         }
         // MethodList2
@@ -107,7 +108,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         console.log(`executing entity`);
         let result: Entity = new Entity();
         // variable
-        const name = branch.branchNonSkipChildren.toArray()[0].matchedText;
+        const name = branch.nonSkipChildren.toArray()[1].matchedText;
         if (name) {
             result.name = name;
         } else {
