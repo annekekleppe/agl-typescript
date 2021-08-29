@@ -10,10 +10,10 @@ grammar PiExample {
     skip SINGLE_LINE_COMMENT = "//.*?$" ;
 
 ExModel = 'model' variable '{'
-(Entity)*
-'model' 'wide' 'Methods:'
-MethodList2
-'}' ;
+	Entity*
+	'model' 'wide' 'Methods:'
+	Method*
+	'}' ;
 
 Entity = 'Entity' variable ('base' EntityPiElemRef )? '{'
     AttributeList3

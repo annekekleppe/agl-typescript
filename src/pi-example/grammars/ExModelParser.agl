@@ -10,20 +10,22 @@ grammar PiExample {
     skip SINGLE_LINE_COMMENT = "//.*?$" ;
 
 ExModel = 'model' variable '{'
-	(Entity)*
+	Entity*
 	'model' 'wide' 'Methods:'
-	MethodList2
+	Method*
 	'}' ;
 
-Entity = 'Entity' variable ('base' EntityPiElemRef )? '{'
-    	AttributeList3
-    	MethodList4
+Entity = 'Entity' variable OptionalBase? '{'
+    	Attribute*
+    	Method*
     	'}' ;
 
-Attribute = variable ':' TypePiElemRef; 
+OptionalBase = 'base' variable ;
 
-Method = 'method' variable '(' ParameterList5 '):' TypePiElemRef '{' 
-	ExExpression 
+Attribute = variable ':' variable;
+
+Method = 'method' variable '(' [Parameter / ',']* '):' variable '{'
+	ExExpression
 	'}' ;
 
 ExExpression = LiteralExpression 
@@ -39,106 +41,42 @@ LiteralExpression = StringLiteralExpression
     | NumberLiteralExpression 
     | BooleanLiteralExpression ;
 
-StringLiteralExpression = ''' stringLiteral ''' ;
+StringLiteralExpression = stringLiteral ;
 
-AppliedFeature = AttributeRef ;
+NumberLiteralExpression = numberLiteral ;
 
-AttributeRef = AttributePiElemRef ;
-
-NumberLiteralExpression = stringLiteral ;
-
-BooleanLiteralExpression = stringLiteral ;
+BooleanLiteralExpression = booleanLiteral ;
 
 AbsExpression = 'abs(' ExExpression ')' ;
 
-ParameterRef = ParameterPiElemRef '.' AppliedFeature ;
+ParameterRef = variable '.' AppliedFeature ;
 
-LoopVariableRef = LoopVariablePiElemRef ;
+AppliedFeature = variable ;
 
-SumExpression = 'sum' 'from' LoopVariable '=' ExExpression 'to' ExExpression 'of' ExExpression;
+LoopVariableRef = variable ;
 
-LoopVariable = variable;
+SumExpression = 'sum' 'from' variable '=' ExExpression 'to' ExExpression 'of' ExExpression;
 
-MethodCallExpression = 'CALL' MethodPiElemRef '(' ExExpressionList6 ')' ;
+MethodCallExpression = 'CALL' variable '(' [ExExpression / ',']* ')' ;
 
-IfExpression = 'if' '(' ExExpression ')' 'then' 
+IfExpression = 'if' ExExpression 'then'
 	ExExpression
 	'else' 
 	ExExpression
 	'endif';
 
-BinaryExpression = MultiplyExpression
-    | PlusExpression
-    | DivideExpression
-    | AndExpression
-    | OrExpression 
-    | ComparisonExpression;
+BinaryExpression = [ExExpression / Operator]+;
 
-MultiplyExpression = '(' ExExpression '*' ExExpression ')';
+Operator = '*' | '+' | '|' | 'and' | 'or' | '<' | '>' | '==' ;
     
-PlusExpression = '(' ExExpression '+' ExExpression ')';
-    
-DivideExpression = '(' ExExpression '|' ExExpression ')';
-    
-AndExpression = '(' ExExpression 'and' ExExpression ')';
-    
-OrExpression = '(' ExExpression 'or' ExExpression ')';
-    
-ComparisonExpression = LessThenExpression 
-    | GreaterThenExpression
-    | EqualsExpression;
+Parameter = variable  ':'  variable;
 
-LessThenExpression = '(' ExExpression '<' ExExpression ')';
-    
-GreaterThenExpression = '(' ExExpression '>' ExExpression ')';
-
-EqualsExpression = '(' ExExpression '==' ExExpression ')';
-    
-Parameter = variable  ':'  TypePiElemRef;
-
-EntityPiElemRef = variable;
-
-TypePiElemRef = variable;
-
-AttributePiElemRef = variable;
-
-ParameterPiElemRef = variable;
-
-LoopVariablePiElemRef = variable;
-
-MethodPiElemRef = variable;
-
-MethodList2 = Method*;
-
-AttributeList3 = Attribute*;
-
-MethodList4 = Method*;
-
-ParameterList5 = [Parameter / ',']*; // comma-separated list
-
-ExExpressionList6 = [ExExpression / ',']*; // comma-separated list
-
-anyChar             = "[a-zA-Z0-9' ]";
+anyChar             = ".";
 number              = "[0-9]";
 
 leaf variable            = "[a-zA-Z_][a-zA-Z0-9_]*" ;
 leaf stringLiteral       = '"' anyChar* '"';
 leaf numberLiteral       = number+;
 leaf booleanLiteral      = 'false' | 'true';
-
-
-/* TODO the following rules do not work in AGL
-varLetter1           = '[a-zA-Z]';
-identifierChar1      = '[a-zA-Z0-9_$]'; // any char but not /.,!?@~%^&*-=+(){}'':;<>?[]'/
-anyChar1             = '[a-zA-Z0-9' /\-\[\]\'+<>=#$_.,!?@~%^&\*-=(){}:;<>?]';
-number1              = '[0-9]';
-
-leaf variable1            = varLetter identifierChar*;
-leaf stringLiteral1       = '"' anyChar* '"';
-leaf numberLiteral1       = number+;
-leaf booleanLiteral1      = 'false' | 'true';
-*/
-//TODO extend anyChar with ? + *
-/* TODO see whether the rest of the rules in pegjs can be replaced by the rules in the prefix */
 
 }

@@ -85,7 +85,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         // (Entity)*
         // entities = this.transformEntities()
         // branch.children(0)
-        for (const child of branch.nonSkipChildren.toArray()[3].nonSkipChildren.toArray()[0].nonSkipChildren.toArray()[0].branchNonSkipChildren.toArray()) {
+        for (const child of branch.nonSkipChildren.toArray()[3].branchNonSkipChildren.toArray()) {
             let ent = null;
             try {
                 ent = this.transformNode(child);

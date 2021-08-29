@@ -1,8 +1,13 @@
 namespace test
 grammar PiExample {
 
+    skip WHITE_SPACE = "\s+" ;
+    skip MULTI_LINE_COMMENT = "/\*[^*]*\*+(?:[^*/][^*]*\*+)*/" ;
+    skip SINGLE_LINE_COMMENT = "//.*?$" ;
+
+
 Editor_Definition
-  = "editor" variable "for" "language" variable (conceptEditor)* ;
+  = 'editor' variable 'for' 'language' variable (conceptEditor)* ;
 
 conceptEditor =
             conceptRef curly_begin
@@ -11,7 +16,7 @@ conceptEditor =
                 symbol?
             curly_end ;
 
-projection = "@projection" variable? projection_begin
+projection = '@projection' variable? projection_begin
                    line*
               projection_end ;
 
@@ -22,7 +27,7 @@ property_projection =
                     expression listJoin? keywordDecl?
                 propProjectionEnd ;
 
-keywordDecl = "@keyword" joinText ;
+keywordDecl = '@keyword' joinText ;
 
 listJoin = listJoinSimple+ ;
 
@@ -30,42 +35,46 @@ listJoinSimple =      direction
                     | (listJoinType )
                     | (joinText     ) ;
 
-joinText = "[" anythingButEndBracket* "]" ;
+joinText = '[' anythingButEndBracket* ']' ;
 
-direction = ("@horizontal" | "@vertical") ;
+direction = ('@horizontal' | '@vertical') ;
 
-listJoinType = ("@separator" | "@terminator") ;
+listJoinType = ('@separator' | '@terminator') ;
 
-propProjectionStart = "${" ;
-propProjectionEnd = "}" ;
+propProjectionStart = '${' ;
+propProjectionEnd = '}' ;
 
 text        = anythingBut+ ;
 
 anythingButEndBracket = "[^\]]" sourceChar ;
 
-anythingBut = !("${" | newline | "]" | "[" ) char ;
+// ORIGanythingBut = !("${" | newline | "]" | "[" ) char ;
 
-sourceChar = . ;
+anythingBut = "(?!\$\{ | newline | \[ | \[)" anyChar ;
 
-newline     = "\r"? "\n" ;
+sourceChar = "." ;
+
+newline     = "\r?" "\n" ;
 
 line        = (templateSpace | text | property_projection | subProjection | newline )+ ;
 
 subProjection = projection_begin
-                    "?"?
+                    '?'?
                     (templateSpace | text | property_projection )+
                 projection_end ;
 
 conceptReference = variable ;
 
-trigger = "@trigger" "\"" string "\"" ;
+trigger = '@trigger' '"' string '"' ;
 
-symbol = "@symbol"   "\"" string "\"" ;
+symbol = '@symbol'   '"' string '"' ;
 
-priority = "priority"      ":"      "\"" string "\"" ;
+priority = 'priority'      ':'      '"' string '"' ;
 
-projection_begin    =      "[" ;
-projection_end      = "]" ;
+projection_begin    =      '[' ;
+projection_end      = ']' ;
+
+string = anyChar*;
 
 // These are the parsing rules for the expressions over the language structure,
 // as defined in meta/src/languagedef/metalanguage/PiLangExpressions.ts
@@ -95,21 +104,21 @@ functionExpression =
         [ langExpression / ',']*
     round_end ;
 
-simpleExpression = numberliteral ;
+simpleExpression = numberLiteral ;
 
 // This is a partial grammar file for re-use in other grammars
 
 // the following is basic stuff
 
-curly_begin    =      "{" ;
-curly_end      =      "}" ;
-round_begin    =      "(" ;
-round_end      =      ")" ;
-comma_separator =      "," ;
-semicolon_separator =      ";" ;
-colon_separator  =      ":" ;
-equals_separator  =      "=" ;
-plus_separator =      "+" ;
+curly_begin    =      '{' ;
+curly_end      =      '}' ;
+round_begin    =      '(' ;
+round_end      =      ')' ;
+comma_separator =      ',' ;
+semicolon_separator =      ';' ;
+colon_separator  =      ':' ;
+equals_separator  =      '=' ;
+plus_separator =      '+' ;
 
 anyChar             = "[a-zA-Z0-9' ]";
 number              = "[0-9]";

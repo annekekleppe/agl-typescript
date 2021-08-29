@@ -14,7 +14,7 @@ Double => regular expression, Single => literal
 -. How to work with the multiple trees? => childrenAlternatives: Set of Lists
 -. Why does the error "Could not match goal, at line 41 column 9, expected one of ['"', stringLiteral, 'abs(', "[a-zA-Z_][a-zA-Z0-9_]*", 'sum', 'CALL', 'if', '(']
        " occur on "/sentences/LargeUnit.exm"?
--. What is the 'namespace' variable at the start of the grammar? => has to do with combining grammas
+-. What is the 'namespace' variable at the start of the grammar? => has to do with combining grammars
 -. When skipping whitespace, is there a possibility to require whitespace, eg. "abstract root concept" instead of
 "abstractroot concept", or "abstract rootconcept". => add Whitespace to the rule
     
