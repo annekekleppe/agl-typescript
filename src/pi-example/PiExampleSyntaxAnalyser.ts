@@ -8,7 +8,7 @@ import SPPTNode = net.akehurst.language.api.sppt.SPPTNode;
 import {
     Attribute,
     Entity, ExampleEveryConcept,
-    ExModel, Method, Type
+    ExModel, Method, Parameter, Type
 } from "./language/gen";
 import {ExampleModelUnitWriter} from "./writer/gen/ExampleModelUnitWriter";
 import {PiElementReference} from "./language/gen/PiElementReference";
@@ -45,12 +45,14 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
             return this.exmodel(branch);
         } else if ('Entity' == brName) {
             return this.entity(branch);
+        } else if ('OptionalBaseEntity' == brName) {
+            return this.optionalBaseEntity(branch);
         } else if ('Attribute' == brName) {
             return this.attribute(branch);
         } else if ('Method' == brName) {
             return this.method(branch);
-        } else if ('OptionalBaseEntity' == brName) {
-            return this.optionalBaseEntity(branch);
+        } else if ('Parameter' == brName) {
+            return this.parameter(branch);
         } else if ('EntityPiElemRef' == brName) {
             return this.entityPiElemRef(branch);
         } else {
@@ -67,7 +69,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     // 'model' 'wide' 'Methods:'
     // Method*
     // '}' ;
-    exmodel(branch: SPPTBranch): ExModel {
+    private exmodel(branch: SPPTBranch): ExModel {
         // console.log(`executing exmodel`);
         let result: ExModel = new ExModel();
         // variable
@@ -84,8 +86,8 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         let result: Entity[] = [];
         for (const child of entityList.nonSkipChildren.toArray()) {
             try {
-                let ent = this.transformNode(child);
-                if (ent) result.push(ent);
+                let element = this.transformNode(child);
+                if (element) result.push(element);
             } catch (e) {
                 console.log(`entity list ERROR: ${e.message}`);
             }
@@ -98,10 +100,30 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         let result: Method[] = [];
         for (const child of methodList.nonSkipChildren.toArray()) {
             try {
-                let ent = this.transformNode(child);
-                if (ent) result.push(ent);
+                let element = this.transformNode(child);
+                if (element) result.push(element);
             } catch (e) {
                 console.log(`method list ERROR: ${e.message}`);
+            }
+        }
+        return result;
+    }
+
+    transformParameterList(parameterList: SPPTBranch, separator?: string) : Parameter[] {
+        // console.log(`executing parameter list`);
+        let result: Parameter[] = [];
+        for (const child of parameterList.nonSkipChildren.toArray()) {
+            try {
+                let element = this.transformNode(child);
+                if (element) {
+                    if (!separator) {
+                        result.push(element);
+                    } else {
+                        if (element !== separator) result.push(element);
+                    }
+                }
+            } catch (e) {
+                console.log(`parameter list ERROR: ${e.message}`);
             }
         }
         return result;
@@ -125,8 +147,8 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     // Attribute*
     // Method*
     // '}' ;
-    entity(branch: SPPTBranch): Entity {
-        console.log(`executing entity`);
+    private  entity(branch: SPPTBranch): Entity {
+        // console.log(`executing entity`);
         let result: Entity = new Entity();
         // variable
         result.name = this.variableName(branch.nonSkipChildren.toArray()[1]);
@@ -140,8 +162,8 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     }
 
     // OptionalBaseEntity = 'base' EntityPiElemRef ;
-    optionalBaseEntity(branch: SPPTBranch): PiElementReference<Entity> {
-        console.log(`executing optionalBaseEntity: ` + branch.matchedText);
+    private optionalBaseEntity(branch: SPPTBranch): PiElementReference<Entity> {
+        // console.log(`executing optionalBaseEntity: ` + branch.matchedText);
         if (!branch.isEmptyMatch) {
             // TODO ask David why the second nonSkipChildren is needed
             return this.entityPiElemRef(branch.nonSkipChildren.toArray()[0].nonSkipChildren.toArray()[1]);
@@ -151,7 +173,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     }
 
     // Attribute = variable ':' TypePiElemRef;
-    attribute(branch: SPPTBranch): Attribute {
+    private attribute(branch: SPPTBranch): Attribute {
         // console.log(`executing attribute`);
         let result = new Attribute();
         result.name = this.variableName(branch.nonSkipChildren.toArray()[0]);
@@ -162,11 +184,20 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     // Method = 'method' variable '(' [Parameter / ',']* '):' TypePiElemRef '{'
     // ExExpression
     // '}' ;
-    method(branch: SPPTBranch): Method {
+    private method(branch: SPPTBranch): Method {
         // console.log(`executing method`);
         let result = new Method();
         result.name = this.variableName(branch.nonSkipChildren.toArray()[1]);
+        result.parameters.push(...this.transformParameterList(branch.nonSkipChildren.toArray()[3], ','));
         result.declaredType = this.typePiElemRef(branch.nonSkipChildren.toArray()[5]);
+        return result;
+    }
+
+    // Parameter = variable  ':'  TypePiElemRef;
+    private parameter(branch: SPPTBranch): Parameter {
+        let result = new Parameter();
+        result.name = this.variableName(branch.nonSkipChildren.toArray()[0]);
+        result.declaredType = this.typePiElemRef(branch.nonSkipChildren.toArray()[2]);
         return result;
     }
 
