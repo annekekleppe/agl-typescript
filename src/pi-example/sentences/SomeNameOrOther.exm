@@ -1,5 +1,5 @@
 model SomeNameOrOther { 
-    Entity ent1 { 
+    Entity ent1 base ent4 {
         myTextAttribute : String
 
         otherAtrr : Boolean
@@ -10,7 +10,7 @@ model SomeNameOrOther {
         }
 
         method meth000 ( par1 : String,par2 : ent1): Integer { 
-            abs( par1 )
+            abs( par1 ) + CALL meth21()
         }
     }
 
@@ -25,6 +25,6 @@ model SomeNameOrOther {
 
 model wide Methods: 
     method meth21 ( ): Integer { 
-        786
+        if 20 then 21 else 45 endif
     }
 }

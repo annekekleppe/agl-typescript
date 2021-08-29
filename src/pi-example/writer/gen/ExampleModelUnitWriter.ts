@@ -256,7 +256,7 @@ export class ExampleModelUnitWriter implements PiWriter {
         // do the first line
         this.output[this.currentLine] += `Entity `;
         this.output[this.currentLine] += `${modelelement.name} `;
-        if (!!modelelement.baseEntity?.referred) {
+        if (!!modelelement.baseEntity) {
             this.output[this.currentLine] += `base `;
             if (!!modelelement.baseEntity) {
                 this.output[this.currentLine] += `${modelelement.baseEntity.name} `;
