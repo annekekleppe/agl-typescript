@@ -9,8 +9,12 @@ model SomeNameOrOther {
             ( ( ( 23 * 56 ) / 45 ) + 458 )
         }
 
-        method meth000 ( par1 : String,par2 : ent1): Integer { 
-            abs( par1 ) + CALL meth21()
+        method meth56A ( ): Integer {
+            23 * 56 / 45 + 458
+        }
+
+        method meth000 ( par1 : String, par2 : ent1): Integer {
+            abs( par1.xx ) + CALL meth21()
         }
     }
 

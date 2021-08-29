@@ -373,7 +373,7 @@ export class ExampleModelUnitWriter implements PiWriter {
      * See the public unparse method.
      */
     private unparseNumberLiteralExpression(modelelement: NumberLiteralExpression, short: boolean) {
-        this.output[this.currentLine] += `"${modelelement.value}" `;
+        this.output[this.currentLine] += `${modelelement.value} `;
     }
 
     /**
@@ -469,7 +469,7 @@ export class ExampleModelUnitWriter implements PiWriter {
      * See the public unparse method.
      */
     private unparseBooleanLiteralExpression(modelelement: BooleanLiteralExpression, short: boolean) {
-        this.output[this.currentLine] += `"${modelelement.value}" `;
+        this.output[this.currentLine] += `${modelelement.value} `;
     }
 
     /**
@@ -496,9 +496,9 @@ export class ExampleModelUnitWriter implements PiWriter {
     private unparseIfExpression(modelelement: IfExpression, short: boolean) {
         const blockIndent = this.output[this.currentLine].length;
         // do the first line
-        this.output[this.currentLine] += `if ( `;
+        this.output[this.currentLine] += `if `;
         this.unparse(modelelement.condition, short);
-        this.output[this.currentLine] += `) then `;
+        this.output[this.currentLine] += ` then `;
 
         if (!short) {
             // do the rest of the lines as well
