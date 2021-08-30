@@ -71,8 +71,8 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
             return this.numberLiteralExpression(branch);
         } else if ('BooleanLiteralExpression' == brName) {
             return this.booleanLiteralExpression(branch);
-        } else if ('AbsExpression' == brName) {
-            return this.absExpression(branch);
+        // } else if ('AbsExpression' == brName) {
+        //     return this.absExpression(branch);
         } else if ('ParameterRef' == brName) {
             return this.parameterRef(branch);
         } else if ('AttributeRef' == brName) {
@@ -96,7 +96,6 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
         } else if ('ExExpression' == brName) {
             return this.exExpression(branch);
         } else {
-            // TODO why does this error not show, instead "undefined"
             throw `Error: ${brName} not handled`;
         }
     }
@@ -122,22 +121,35 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     private entity(branch: SPPTBranch): Entity {
         // console.log(`executing entity`);
         let result: Entity = new Entity();
-        result.name = this.transformNode(branch.nonSkipChildren.toArray()[1]);
-        result.baseEntity = this.optionalBaseEntity(branch.nonSkipChildren.toArray()[2]);
-        result.attributes.push(...this.transformList<Attribute>(branch.nonSkipChildren.toArray()[4]));
-        result.methods.push(...this.transformList<Method>(branch.nonSkipChildren.toArray()[5]));
+        let children: SPPTNode = branch.nonSkipChildren.toArray();
+
+        result.name = this.transformNode(children[1]);
+
+        // OptionalBaseEntity?
+        const baseNode = children[2] as SPPTBranch;
+        if (!baseNode.isEmptyMatch) {
+            // transform the first element in the [0..1] optional collection
+            result.baseEntity = this.optionalBaseEntity(baseNode.nonSkipChildren.toArray()[0]);
+        }
+
+        result.attributes.push(...this.transformList<Attribute>(children[4]));
+        result.methods.push(...this.transformList<Method>(children[5]));
         return result;
     }
 
     // OptionalBaseEntity = 'base' EntityPiElemRef ;
     private optionalBaseEntity(branch: SPPTBranch): PiElementReference<Entity> {
         // console.log(`executing optionalBaseEntity: ` + branch.matchedText);
-        if (!branch.isEmptyMatch) {
-            // TODO ask David why the second nonSkipChildren is needed and why it is [1].
-            return this.piElemRef<Entity>(branch.nonSkipChildren.toArray()[0].nonSkipChildren.toArray()[1]);
-        } else {
-            return null;
-        }
+        // if (!branch.isEmptyMatch) {
+        //     // TODO ask David why the second nonSkipChildren is needed and why it is [1].
+        //     // JOS: Optional is equivalent to a List with 0 or 1 element, so you always have the list node in between.
+        //     //    As the optional is in the 'entity' rule, the check on `isEmptyMatch' would be more logical
+        //     //    in the entity rule, as I have done here
+        // return this.piElemRef<Entity>(branch.nonSkipChildren.toArray()[0].nonSkipChildren.toArray()[1]);
+        return this.piElemRef<Entity>(branch.nonSkipChildren.toArray()[1]);
+        // } else {
+        //     return null;
+        // }
     }
 
     // Attribute = variable ':' TypePiElemRef;
@@ -198,7 +210,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     private stringLiteralExpression(branch: SPPTBranch) : StringLiteralExpression {
         // console.log(`executing StringLiteralExpression`);
         let result = new StringLiteralExpression();
-        result.value = this.transformNode(branch.nonSkipChildren.toArray()[0]);
+        result.value = this.transformNode(branch.nonSkipChildren.toArray()[1]);
         return result;
     }
 
@@ -211,6 +223,9 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
     }
 
     // BooleanLiteralExpression = booleanLiteral ;
+    // TODO Booleanliteral is defined as "true",  and thus also matches a string literal.
+    //      And defining it as true without quotes also matches a LoopVariableReference.
+    //      In both cases we need some way to distinguish these ambiguities, but it is not cleear from the context, the all fit!
     private booleanLiteralExpression(branch: SPPTBranch) : BooleanLiteralExpression {
         // console.log(`executing booleanLiteralExpression`);
         let result = new BooleanLiteralExpression();
@@ -387,7 +402,7 @@ export class PiExampleSyntaxAnalyser implements SyntaxAnalyser {
                     }
                 }
             } catch (e) {
-                console.log(`list ERROR: ${e.message}`);
+                console.log(`list ERROR: ${e}`);
             }
         }
         return result;
